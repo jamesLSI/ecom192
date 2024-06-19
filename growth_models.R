@@ -34,7 +34,8 @@ countries <- tibble(Country = c("United Kingdom",
                     voc = c(rep("LME",6),
                             rep("CME",11)))
 
-net_exports <- exports %>% 
+exports_gdp <- exports %>% 
+  ## prepare exports data
   select(8:ncol(.)) %>% 
   filter(Title %in% c("Exports of goods and services at 2015 prices")) %>% 
   filter(Country %in% countries$Country) %>% 
@@ -45,6 +46,7 @@ net_exports <- exports %>%
             Title,
             Unit_2))%>% 
   mutate(exports_2015_prices = as.numeric(exports_2015_prices)) %>% 
+  ## prepare and join import data
   left_join(exports %>% 
               select(8:ncol(.)) %>% 
               filter(Title %in% c("Imports of goods and services at 2015 prices")) %>% 
@@ -57,7 +59,7 @@ net_exports <- exports %>%
                         Unit_2)) %>% 
               mutate(imports_2015_prices = as.numeric(imports_2015_prices)),
             by = join_by(Country, year)) %>% 
-  mutate(net_exports = exports_2015_prices - imports_2015_prices) %>% 
+  ## prepare and join export contribution to gdp growth data
   left_join(gdp %>% 
               select(8:ncol(.)) %>% 
               filter(Country %in% countries$Country) %>% 
@@ -69,7 +71,8 @@ net_exports <- exports %>%
                         Title,
                         Unit_2))%>% 
               mutate(export_contrib_gdp = as.numeric(export_contrib_gdp)),
-            by = join_by(Country, year)) %>% 
+            by = join_by(Country, year)) %>%
+  ## prepare and join import contribution to gdp growth data
   left_join(gdp %>% 
               select(8:ncol(.)) %>% 
               filter(Country %in% countries$Country) %>% 
@@ -82,6 +85,7 @@ net_exports <- exports %>%
                         Unit_2))%>% 
               mutate(import_contrib_gdp = as.numeric(import_contrib_gdp)),
             by = join_by(Country, year)) %>% 
+  ## prepare and join private consumption contribution to gdp growth data
   left_join(gdp %>% 
               select(8:ncol(.)) %>% 
               filter(Country %in% countries$Country) %>%   
@@ -93,11 +97,20 @@ net_exports <- exports %>%
                         Title,
                         Unit_2)) %>% 
               mutate(hh_cons_contrib_gdp = as.numeric(hh_cons_contrib_gdp))) %>% 
+  ## modify year variable
   mutate(year = str_remove_all(year, "X"),
-         year = as.numeric(year)) %>% 
+         year = as.numeric(year))
+
+net_export_gdp_contributions <- exports_gdp %>% 
+  ## calc net exports
+  mutate(net_exports = exports_2015_prices - imports_2015_prices) %>% 
+  ## calc exports net contribution based on other data ##### THIS FEEL WRONG ######
   mutate(net_export_contrib = export_contrib_gdp + import_contrib_gdp) %>% 
+  ## calc net exports growth rate
   mutate(ne_growth_rate = (net_exports-lag(net_exports, 1))/lag(net_exports,1)) %>% 
+  ## calc net exports contrib as per Baccaro 
   mutate(ne_contrib = ne_growth_rate*lag(net_export_contrib,1)) %>% 
+  ## recreate Baccaro periods
   mutate(period = if_else(year %in% 1994:1998,
                           "Period 1",
                           if_else(year %in% 1999:2003,
@@ -106,25 +119,32 @@ net_exports <- exports %>%
                                           "Period 3",
                                           ""))))
 
-net_exports %>% 
+net_export_gdp_contributions %>% 
+  ## remove other time periods
   filter(!period == "") %>% 
-  # filter(Country == "United Kingdom") %>%
+  ## group and summarise
   group_by(Country,
            period) %>% 
   summarise(average_ne_contrib_gdp = mean(net_export_contrib),
             average_hh_cons_contrib_gdp = mean(hh_cons_contrib_gdp),
             .groups = "drop") %>% 
+  ## join to voc definitions
   left_join(countries) %>% 
+  ## reorder variables
   select(Country,
          voc,
-         everything()) %>% 
+         everything()) %>%
+  ## arrange appropriately
   arrange(period,
           voc,
           Country) %>% 
+  ## define growth model
   mutate(growth_model = if_else(average_ne_contrib_gdp > average_hh_cons_contrib_gdp,
                                 "export-led",
                                 "consumption-led")) %>% 
+  ## remove any country without both measures
   filter(!is.na(growth_model)) %>% 
+  ## write to csv
   write_csv("growth_model_table.csv")
 
 
