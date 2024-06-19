@@ -14,17 +14,30 @@ gdp <- read_excel("AMECO6_gdp.XLSX",
 
 #### The contribution of net exports (final private consumption) to growth is calculated by multiplying the annual growth rate of net exports (final private consumption) by the share of net exports (final private consumption) in GDP at t − 1. The values are period averages (1994–98; 1999–2003; 2004–7).
 
-countries <- c("United Kingdom",
-               "United States",
-               "Ireland",
-               "Germany",
-               "Netherlands",
-               "Denmark")
+countries <- tibble(Country = c("United Kingdom",
+                                "United States",
+                                "Ireland",
+                                "Australia",
+                                "Canada",
+                                "New Zealand",
+                                "Germany",
+                                "Netherlands",
+                                "Denmark",
+                                "Austria",
+                                "Belgium",
+                                "Finland",
+                                "Iceland",
+                                "Japan",
+                                "Norway",
+                                "Sweden",
+                                "Switzerland"),
+                    voc = c(rep("LME",6),
+                            rep("CME",11)))
 
 net_exports <- exports %>% 
   select(8:ncol(.)) %>% 
   filter(Title %in% c("Exports of goods and services at 2015 prices")) %>% 
-  filter(Country %in% countries) %>% 
+  filter(Country %in% countries$Country) %>% 
   pivot_longer(5:ncol(.),
                names_to = "year",
                values_to = "exports_2015_prices") %>% 
@@ -35,7 +48,7 @@ net_exports <- exports %>%
   left_join(exports %>% 
               select(8:ncol(.)) %>% 
               filter(Title %in% c("Imports of goods and services at 2015 prices")) %>% 
-              filter(Country %in% countries) %>% 
+              filter(Country %in% countries$Country) %>% 
               pivot_longer(5:ncol(.),
                            names_to = "year",
                            values_to = "imports_2015_prices") %>% 
@@ -47,7 +60,7 @@ net_exports <- exports %>%
   mutate(net_exports = exports_2015_prices - imports_2015_prices) %>% 
   left_join(gdp %>% 
               select(8:ncol(.)) %>% 
-              filter(Country %in% countries) %>% 
+              filter(Country %in% countries$Country) %>% 
               filter(Title == "Contribution to the increase of GDP at constant prices of exports of goods and services :- including intra-EU trade") %>% 
               pivot_longer(5:ncol(.),
                            names_to = "year",
@@ -59,7 +72,7 @@ net_exports <- exports %>%
             by = join_by(Country, year)) %>% 
   left_join(gdp %>% 
               select(8:ncol(.)) %>% 
-              filter(Country %in% countries) %>% 
+              filter(Country %in% countries$Country) %>% 
               filter(Title == "Contribution to the increase of GDP at constant prices of imports of goods and services :- including intra-EU trade") %>% 
               pivot_longer(5:ncol(.),
                            names_to = "year",
@@ -71,7 +84,7 @@ net_exports <- exports %>%
             by = join_by(Country, year)) %>% 
   left_join(gdp %>% 
               select(8:ncol(.)) %>% 
-              filter(Country %in% countries) %>%  
+              filter(Country %in% countries$Country) %>%   
               filter(str_detect(tolower(Title), "private consumption")) %>% 
               pivot_longer(5:ncol(.),
                            names_to = "year",
@@ -98,11 +111,21 @@ net_exports %>%
   # filter(Country == "United Kingdom") %>%
   group_by(Country,
            period) %>% 
-  summarise(average_ne_contrib_gdp = mean(ne_contrib),
+  summarise(average_ne_contrib_gdp = mean(net_export_contrib),
             average_hh_cons_contrib_gdp = mean(hh_cons_contrib_gdp),
             .groups = "drop") %>% 
+  left_join(countries) %>% 
+  select(Country,
+         voc,
+         everything()) %>% 
   arrange(period,
-          Country)
+          voc,
+          Country) %>% 
+  mutate(growth_model = if_else(average_ne_contrib_gdp > average_hh_cons_contrib_gdp,
+                                "export-led",
+                                "consumption-led")) %>% 
+  filter(!is.na(growth_model)) %>% 
+  write_csv("growth_model_table.csv")
 
 
 

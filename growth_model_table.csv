@@ -1,0 +1,43 @@
+Country,voc,period,average_ne_contrib_gdp,average_hh_cons_contrib_gdp,growth_model
+Austria,CME,Period 1,4.83656038,1.01471252,export-led
+Belgium,CME,Period 1,8.00914308,1.14564068,export-led
+Denmark,CME,Period 1,4.26762096,1.61283702,export-led
+Finland,CME,Period 1,6.3067465,2.02613094,export-led
+Germany,CME,Period 1,3.47540886,0.75798402,export-led
+Iceland,CME,Period 1,5.26794734,3.32217712,export-led
+Japan,CME,Period 1,0.7397031000000001,0.70237786,export-led
+Netherlands,CME,Period 1,8.87263542,1.92158336,export-led
+Norway,CME,Period 1,5.04123878,1.8790224,export-led
+Sweden,CME,Period 1,6.45180198,1.0654817,export-led
+Switzerland,CME,Period 1,4.28595348,0.90843558,export-led
+Ireland,LME,Period 1,23.859039980000002,3.14292812,export-led
+United Kingdom,LME,Period 1,3.8554784,2.3687497,export-led
+United States,LME,Period 1,2.0978966999999997,2.5110855,consumption-led
+Austria,CME,Period 2,4.34840236,0.9952722599999999,export-led
+Belgium,CME,Period 2,5.215837039999999,0.75373124,export-led
+Denmark,CME,Period 2,4.09904508,0.30751846,export-led
+Finland,CME,Period 2,4.15635768,1.42610272,export-led
+Germany,CME,Period 2,2.99633942,0.50046974,export-led
+Iceland,CME,Period 2,1.7536107,1.53003158,export-led
+Japan,CME,Period 2,0.8504338,0.7100044999999999,export-led
+Netherlands,CME,Period 2,5.86835782,1.27745522,export-led
+Norway,CME,Period 2,1.0899159999999999,1.48257774,consumption-led
+Sweden,CME,Period 2,3.3564495,1.34813738,export-led
+Switzerland,CME,Period 2,2.20503462,0.87292044,export-led
+Ireland,LME,Period 2,17.5384308,2.9324477,export-led
+United Kingdom,LME,Period 2,2.44838508,2.40247408,export-led
+United States,LME,Period 2,0.9215784,2.44780526,consumption-led
+Austria,CME,Period 3,6.392351574999999,1.04488005,export-led
+Belgium,CME,Period 3,8.130777349999999,0.8020849,export-led
+Denmark,CME,Period 3,6.7788228749999995,1.551992225,export-led
+Finland,CME,Period 3,6.286928475,1.7802072,export-led
+Germany,CME,Period 3,6.130953425,0.3537012,export-led
+Iceland,CME,Period 3,7.373791125,4.149144875,export-led
+Japan,CME,Period 3,1.935000225,0.6218925,export-led
+Netherlands,CME,Period 3,8.050020075,0.409563425,export-led
+Norway,CME,Period 3,2.607395175,2.157893175,export-led
+Sweden,CME,Period 3,6.16728335,1.5029468750000001,export-led
+Switzerland,CME,Period 3,7.127222875,0.956631475,export-led
+Ireland,LME,Period 3,11.053662325000001,2.620761075,export-led
+United Kingdom,LME,Period 3,2.97951505,1.5338921,export-led
+United States,LME,Period 3,1.823627575,2.1285888,consumption-led
